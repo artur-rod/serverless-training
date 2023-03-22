@@ -10,3 +10,19 @@ services:
     ports:
       - 8000:8000
     command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /home/dynamodblocal/data/"
+
+#   serverless:
+#     platform: linux/arm64
+#     links: 
+#       - dynamodb
+#     depends_on:
+#       - dynamodb
+#     build: .
+#     ports:
+#       - 3000:3000
+#     volumes:
+#       - .:/usr/app
+
+# volumes:
+#   dynamodb-data:
+#     driver: local

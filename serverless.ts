@@ -3,12 +3,13 @@ import type { AWS } from '@serverless/typescript';
 const serverlessConfiguration: AWS = {
   service: 'serverless',
   frameworkVersion: '3',
-  plugins: ['serverless-plugin-typescript', 'serverless-dynamodb-local', 'serverless-offline'],
+  plugins: ['serverless-esbuild', 'serverless-dynamodb-local', 'serverless-offline'],
 
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
     region: "us-east-1",
+    architecture: "arm64",
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
@@ -27,7 +28,7 @@ const serverlessConfiguration: AWS = {
   },
 
   functions: { 
-    hello: {
+    generateCertificate: {
       handler: "src/functions/GenerateCertificate.handler",
       events: [
         {
@@ -41,17 +42,30 @@ const serverlessConfiguration: AWS = {
     }
   },
 
-  package: { individually: true },
+  package: { individually: false, include: ['./src/templates/**'] },
 
   custom: {
+    esbuild: {
+      bundle: true,
+      minify: false,
+      sourcemap: true,
+      exclude: ['aws-sdk'],
+      target: 'node14',
+      define: { 'require.resolve': undefined },
+      platform: 'node',
+      concurrency: 10,
+      external: ['chrome-aws-lambda'],
+    },
     dynamodb: {
-      stages: ["local", "dev"],
+      stages: ['dev', 'local'],
       start: {
-        docker: true,
         port: 8000,
         inMemory: true,
-        migrate: true
-      }
+        migrate: true,
+      },
+    },
+    "serverless-offline": {
+      useDocker: true
     }
   },
 
