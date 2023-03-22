@@ -18,6 +18,11 @@ provider:
         - "dynamodb:*"
       Resource: 
         - "*"
+    - Effect: "Allow"
+      Action:
+        - "s3:*"
+      Resource: 
+        - "*"
 
 plugins:
   - serverless-esbuild
@@ -31,6 +36,13 @@ functions:
       - http: 
           path: "generate-certificate"
           method: "post"
+          cors: true
+  verifyCertificate: 
+    handler: "src/functions/VerifyCertificate.handler"
+    events: 
+      - http: 
+          path: "verify-certificate/{id}"
+          method: "get"
           cors: true
 
 
